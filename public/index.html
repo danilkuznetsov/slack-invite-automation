@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>Join the community on Slack!</title>
+    <link href="css/style.min.css" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700,900,700italic|Open+Sans:700italic,400,600,300,700,800"
+          rel="stylesheet" type="text/css">
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+<div id="wrapper">
+    <div class="main">
+        <div class="header">
+            <h1>
+                <strong>Slack Community</strong>
+            </h1>
+            <h2>
+                Enter your email below to join Community on Slack!
+            </h2>
+        </div>
+    </div>
+    <div class="content">
+        <div class="section section--push">
+		<form id="join-form" class="form" method="post" action="http://<url to slack invite server>">
+                <input id="slack-email" class="field" type="text" name="email" required placeholder="Enter Your Email Address">
+                <input class="submit" type="submit" value="Join">
+            </form>
+        </div>
+        <div class="section">
+            <h4 id="message" class="hidden">
+                Success message
+            </h4>
+        </div>
+    </div>
+
+</div>
+<script>
+    $(function () {
+
+        var form = $("#join-form");
+        var message = $("#message");
+        var email = $("#slack-email");
+        $(form).submit(function (event) {
+            event.preventDefault();
+            var data = $(form).serialize();
+            $.ajax({
+                        type: 'POST',
+                        url: $(form).attr('action'),
+                        data: data
+                    })
+                    .done(function (response) {
+                        var obj = jQuery.parseJSON(response);
+			$(message).removeClass('error');
+                        $(message).removeClass('success');
+                        if (obj.correct === true) {
+			     $(message).addClass('success');
+			} else {
+			    $(message).addClass('error');
+			}		
+		        
+			$(message).html($.parseHTML(obj.msg));
+                        $(message).removeClass('hidden')
+			$('email').val('');
+                    })
+                    .fail(function (data) {
+                        console.log("ss");
+                        $(message).removeClass('success');
+                        $(message).addClass('error');
+                        $(message).removeClass('hidden');
+
+                        if (data.responseText !== '') {
+                            $(message).text(data.responseText);
+                        } else {
+                            $(message).text('Oops! An error occured and your message could not be sent.');
+                        }
+                    });
+        });
+    });
+
+</script>
+
+</body>
+</html>
+
